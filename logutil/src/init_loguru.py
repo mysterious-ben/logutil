@@ -20,6 +20,7 @@ def get_loguru_logger():
 def init_loguru(
     fmt: str = '{time:YYYY-MM-DDTHH:mm:ss.SSS!UTC}Z {name} {level}: {message}',
     level: Union[str, int] = 'DEBUG',
+    enqueue: bool = False,
     stream_on: bool = True,
     file_on: bool = True,
     pushover_on: bool = False,
@@ -38,6 +39,8 @@ def init_loguru(
 
     :param fmt: logging format
     :param level: logging level (stream and file handlers)
+    :param enqueue: set true to make multiprocess / async safe
+        always thread-safe
     :param stream_on: include stream logging handler
     :param file_on: include file logging handler
     :param pushover_on: include pushover logging handler
@@ -56,11 +59,11 @@ def init_loguru(
 
     _logger.remove()
     if stream_on:
-        _logger.add(sys.stderr, format=fmt, level=level)
+        _logger.add(sys.stderr, format=fmt, level=level, enqueue=enqueue)
 
     if file_on:
         _logger.add(
-            file_path, format=fmt, level=level,
+            file_path, format=fmt, level=level, enqueue=enqueue,
             rotation=file_rotation, retention=file_retention
         )
 
@@ -74,7 +77,7 @@ def init_loguru(
             ),
             level=pushover_level,
         )
-        _logger.add(pushover_handler, format=fmt, level=pushover_level)
+        _logger.add(pushover_handler, format=fmt, level=pushover_level, enqueue=enqueue)
 
     if sentry_on:
         import sentry_sdk
@@ -83,7 +86,7 @@ def init_loguru(
         sentry_sdk.init(dsn=sentry_dsn, integrations=[])
 
         sentry_breadcrumb_handler = BreadcrumbHandler(level=sentry_breadcramp_level)
-        _logger.add(sentry_breadcrumb_handler, format=fmt, level=sentry_breadcramp_level)
+        _logger.add(sentry_breadcrumb_handler, format=fmt, level=sentry_breadcramp_level, enqueue=enqueue)
 
         sentry_event_handler = EventHandler(level=sentry_event_level)
-        _logger.add(sentry_event_handler, format=fmt, level=sentry_event_level)
+        _logger.add(sentry_event_handler, format=fmt, level=sentry_event_level, enqueue=enqueue)
