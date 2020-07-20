@@ -25,6 +25,9 @@ def init_loguru(
     file_on: bool = True,
     pushover_on: bool = False,
     sentry_on: bool = False,
+    file_fmt: Optional[str] = None,
+    pushover_fmt: Optional[str] = None,
+    sentry_fmt: Optional[str] = None,
     file_path: PathType = Path(__file__).absolute().parent / 'logs' / 'log.log',
     file_rotation: str = '20 MB',
     file_retention: int = 1,
@@ -45,6 +48,9 @@ def init_loguru(
     :param file_on: include file logging handler
     :param pushover_on: include pushover logging handler
     :param sentry_on: include sentry logging handler
+    :param file_fmt: file logging format (if None, fmt is used)
+    :param pushover_fmt: pushover logging format (if None, fmt is used)
+    :param sentry_fmt: sentry logging format (if None, fmt is used)
     :param file_path: log file path
     :param file_rotation: rotate log file when it reaches this size
     :param file_retention: keep <n> old log file
@@ -62,13 +68,15 @@ def init_loguru(
         _logger.add(sys.stderr, format=fmt, level=level, enqueue=enqueue)
 
     if file_on:
+        file_fmt = fmt if file_fmt is None else file_fmt
         _logger.add(
-            file_path, format=fmt, level=level, enqueue=enqueue,
+            file_path, format=file_fmt, level=level, enqueue=enqueue,
             rotation=file_rotation, retention=file_retention
         )
 
     if pushover_on:
         from notifiers.logging import NotificationHandler
+        pushover_fmt = fmt if pushover_fmt is None else pushover_fmt
         pushover_handler = NotificationHandler(
             'pushover',
             defaults=dict(
@@ -77,16 +85,16 @@ def init_loguru(
             ),
             level=pushover_level,
         )
-        _logger.add(pushover_handler, format=fmt, level=pushover_level, enqueue=enqueue)
+        _logger.add(pushover_handler, format=pushover_fmt, level=pushover_level, enqueue=enqueue)
 
     if sentry_on:
         import sentry_sdk
         from sentry_sdk.integrations.logging import EventHandler, BreadcrumbHandler
-
+        sentry_fmt = fmt if sentry_fmt is None else sentry_fmt
         sentry_sdk.init(dsn=sentry_dsn, integrations=[])
 
         sentry_breadcrumb_handler = BreadcrumbHandler(level=sentry_breadcramp_level)
-        _logger.add(sentry_breadcrumb_handler, format=fmt, level=sentry_breadcramp_level, enqueue=enqueue)
+        _logger.add(sentry_breadcrumb_handler, format=sentry_fmt, level=sentry_breadcramp_level, enqueue=enqueue)
 
         sentry_event_handler = EventHandler(level=sentry_event_level)
-        _logger.add(sentry_event_handler, format=fmt, level=sentry_event_level, enqueue=enqueue)
+        _logger.add(sentry_event_handler, format=sentry_fmt, level=sentry_event_level, enqueue=enqueue)
