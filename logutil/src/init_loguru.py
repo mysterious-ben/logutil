@@ -25,9 +25,11 @@ def init_loguru(
     file_on: bool = True,
     pushover_on: bool = False,
     sentry_on: bool = False,
+    slack_on: bool = False,
     file_fmt: Optional[str] = None,
     pushover_fmt: Optional[str] = None,
     sentry_fmt: Optional[str] = None,
+    slack_fmt: Optional[str] = None,
     file_path: PathType = Path(__file__).absolute().parent / "logs" / "log.log",
     file_rotation: str = "20 MB",
     file_retention: int = 1,
@@ -37,6 +39,8 @@ def init_loguru(
     sentry_event_level: LevelType = "WARNING",
     sentry_breadcramp_level: LevelType = "DEBUG",
     sentry_dsn: str = "",
+    slack_level: LevelType = "WARNING",
+    slack_webhook_url: str = "",
 ):
     """Initialize loguru logging
 
@@ -48,9 +52,11 @@ def init_loguru(
     :param file_on: include file logging handler
     :param pushover_on: include pushover logging handler
     :param sentry_on: include sentry logging handler
+    :param slack_on: include slack logging handler
     :param file_fmt: file logging format (if None, fmt is used)
     :param pushover_fmt: pushover logging format (if None, fmt is used)
     :param sentry_fmt: sentry logging format (if None, fmt is used)
+    :param slack_fmt: slack logging format (if None, fmt is used)
     :param file_path: log file path
     :param file_rotation: rotate log file when it reaches this size
     :param file_retention: keep <n> old log file
@@ -60,6 +66,8 @@ def init_loguru(
     :param sentry_event_level: sentry event logging level (notifications)
     :param sentry_breadcramp_level: sentry breadcramp logging level (additional info)
     :param sentry_dsn: sentry DNS
+    :param slack_level: slack logging level (notifications)
+    :param slack_webhook_url: slack app webhook url
     """
     from loguru import logger as _logger
 
@@ -111,3 +119,16 @@ def init_loguru(
         _logger.add(
             sentry_event_handler, format=sentry_fmt, level=sentry_event_level, enqueue=enqueue
         )
+
+    if slack_on:
+        from notifiers.logging import NotificationHandler
+
+        slack_fmt = fmt if slack_fmt is None else slack_fmt
+        slack_handler = NotificationHandler(
+            "slack",
+            defaults=dict(
+                webhook_url=slack_webhook_url,
+            ),
+            level=slack_level,
+        )
+        _logger.add(slack_handler, format=slack_fmt, level=slack_level, enqueue=enqueue)

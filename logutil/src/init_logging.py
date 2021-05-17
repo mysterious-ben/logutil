@@ -22,6 +22,7 @@ def init_logging(
     file_on: bool = True,
     pushover_on: bool = False,
     sentry_on: bool = False,
+    slack_on: bool = False,
     file_path: PathType = Path(__file__).absolute().parent / "logs" / "log.log",
     file_rotation_bytes: int = 20 * 1024 * 1024,
     file_retention: int = 1,
@@ -31,6 +32,8 @@ def init_logging(
     sentry_event_level: LevelType = "WARNING",
     sentry_breadcramp_level: LevelType = "DEBUG",
     sentry_dsn: str = "",
+    slack_level: LevelType = "WARNING",
+    slack_webhook_url: str = "",
 ):
     """Initialize standard python logging
 
@@ -44,6 +47,7 @@ def init_logging(
     :param file_on: include file logging handler
     :param pushover_on: include pushover logging handler
     :param sentry_on: include sentry logging handler
+    :param slack_on: include slack logging handler
     :param file_path: log file path
     :param file_rotation_bytes: rotate log file when it reaches <n> bytes
     :param file_retention: keep <n> old log file
@@ -53,6 +57,8 @@ def init_logging(
     :param sentry_event_level: sentry event logging level (notifications)
     :param sentry_breadcramp_level: sentry breadcramp logging level (additional info)
     :param sentry_dsn: sentry DNS
+    :param slack_level: slack logging level (notifications)
+    :param slack_webhook_url: slack app webhook url
     """
     import time
     from logging.handlers import RotatingFileHandler
@@ -104,6 +110,19 @@ def init_logging(
 
         sentry_event_handler = EventHandler(level=sentry_event_level)
         _logger.addHandler(sentry_event_handler)
+
+    if slack_on:
+        from notifiers.logging import NotificationHandler
+
+        slack_handler = NotificationHandler(
+            "slack",
+            defaults=dict(
+                webhook_url=slack_webhook_url,
+            ),
+            level=slack_level,
+        )
+        slack_handler.setFormatter(formatter)
+        _logger.addHandler(slack_handler)
 
 
 def get_logging_logger(name: Optional[str] = None):
