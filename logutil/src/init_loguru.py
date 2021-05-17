@@ -5,7 +5,7 @@ Loguru
 
 import sys
 from pathlib import Path
-from typing import *
+from typing import Union, Optional
 
 
 PathType = Union[str, Path]

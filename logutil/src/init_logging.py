@@ -5,7 +5,7 @@ Logging (standard python library)
 
 from pathlib import Path
 import logging
-from typing import *
+from typing import Union, Optional
 
 
 PathType = Union[str, Path]
@@ -64,7 +64,7 @@ def init_logging(
     Path(file_path).parent.mkdir(exist_ok=True, parents=True)
     formatter = logging.Formatter(fmt, datefmt=datefmt)
     if use_gmt_time:
-        formatter.converter = time.gmtime
+        formatter.converter = time.gmtime  # type: ignore
 
     if stream_on:
         sh = logging.StreamHandler()
