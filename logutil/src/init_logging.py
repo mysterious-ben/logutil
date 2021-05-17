@@ -3,10 +3,9 @@ Logging (standard python library)
 """
 
 
-from pathlib import Path
 import logging
-from typing import Union, Optional
-
+from pathlib import Path
+from typing import Optional, Union
 
 PathType = Union[str, Path]
 LevelType = Union[str, int]
@@ -14,27 +13,27 @@ LevelType = Union[str, int]
 
 def init_logging(
     name: Optional[str] = None,
-    fmt: str = '%(asctime)s.%(msecs)03dZ %(name)s %(funcName)s %(levelname)s: %(message)s',
-    datefmt: str = '%Y-%m-%dT%H:%M:%S',
+    fmt: str = "%(asctime)s.%(msecs)03dZ %(name)s %(funcName)s %(levelname)s: %(message)s",
+    datefmt: str = "%Y-%m-%dT%H:%M:%S",
     use_gmt_time: bool = True,
-    level: Union[str, int] = 'DEBUG',
+    level: Union[str, int] = "DEBUG",
     propagate: bool = False,
     stream_on: bool = True,
     file_on: bool = True,
     pushover_on: bool = False,
     sentry_on: bool = False,
-    file_path: PathType = Path(__file__).absolute().parent / 'logs' / 'log.log',
+    file_path: PathType = Path(__file__).absolute().parent / "logs" / "log.log",
     file_rotation_bytes: int = 20 * 1024 * 1024,
     file_retention: int = 1,
-    pushover_level: LevelType = 'WARNING',
-    pushover_user: str = '',
-    pushover_token: str = '',
-    sentry_event_level: LevelType = 'WARNING',
-    sentry_breadcramp_level: LevelType = 'DEBUG',
-    sentry_dsn: str = '',
+    pushover_level: LevelType = "WARNING",
+    pushover_user: str = "",
+    pushover_token: str = "",
+    sentry_event_level: LevelType = "WARNING",
+    sentry_breadcramp_level: LevelType = "DEBUG",
+    sentry_dsn: str = "",
 ):
     """Initialize standard python logging
-    
+
     :param name: logger name
     :param fmt: logging format
     :param datefmt: datetime format
@@ -55,8 +54,8 @@ def init_logging(
     :param sentry_breadcramp_level: sentry breadcramp logging level (additional info)
     :param sentry_dsn: sentry DNS
     """
-    from logging.handlers import RotatingFileHandler
     import time
+    from logging.handlers import RotatingFileHandler
 
     _logger = logging.getLogger(name)
     _logger.handlers.clear()
@@ -72,8 +71,9 @@ def init_logging(
         _logger.addHandler(sh)
 
     if file_on:
-        fh = RotatingFileHandler(file_path, mode='a', maxBytes=file_rotation_bytes,
-                                 backupCount=file_retention)
+        fh = RotatingFileHandler(
+            file_path, mode="a", maxBytes=file_rotation_bytes, backupCount=file_retention
+        )
         fh.setFormatter(formatter)
         _logger.addHandler(fh)
 
@@ -81,8 +81,9 @@ def init_logging(
 
     if pushover_on:
         from notifiers.logging import NotificationHandler
+
         pushover_handler = NotificationHandler(
-            'pushover',
+            "pushover",
             defaults=dict(
                 user=pushover_user,
                 token=pushover_token,
@@ -94,7 +95,7 @@ def init_logging(
 
     if sentry_on:
         import sentry_sdk
-        from sentry_sdk.integrations.logging import EventHandler, BreadcrumbHandler
+        from sentry_sdk.integrations.logging import BreadcrumbHandler, EventHandler
 
         sentry_sdk.init(dsn=sentry_dsn, integrations=[])
 
