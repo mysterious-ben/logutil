@@ -5,8 +5,7 @@ Loguru
 
 import sys
 from pathlib import Path
-from typing import *
-
+from typing import Optional, Union
 
 PathType = Union[str, Path]
 LevelType = Union[str, int]
@@ -14,12 +13,13 @@ LevelType = Union[str, int]
 
 def get_loguru_logger():
     from loguru import logger as _logger
+
     return _logger
 
 
 def init_loguru(
-    fmt: str = '{time:YYYY-MM-DDTHH:mm:ss.SSS!UTC}Z {name} {level}: {message}',
-    level: Union[str, int] = 'DEBUG',
+    fmt: str = "{time:YYYY-MM-DDTHH:mm:ss.SSS!UTC}Z {name} {level}: {message}",
+    level: Union[str, int] = "DEBUG",
     enqueue: bool = False,
     stream_on: bool = True,
     file_on: bool = True,
@@ -28,15 +28,15 @@ def init_loguru(
     file_fmt: Optional[str] = None,
     pushover_fmt: Optional[str] = None,
     sentry_fmt: Optional[str] = None,
-    file_path: PathType = Path(__file__).absolute().parent / 'logs' / 'log.log',
-    file_rotation: str = '20 MB',
+    file_path: PathType = Path(__file__).absolute().parent / "logs" / "log.log",
+    file_rotation: str = "20 MB",
     file_retention: int = 1,
-    pushover_level: LevelType = 'WARNING',
-    pushover_user: str = '',
-    pushover_token: str = '',
-    sentry_event_level: LevelType = 'WARNING',
-    sentry_breadcramp_level: LevelType = 'DEBUG',
-    sentry_dsn: str = '',
+    pushover_level: LevelType = "WARNING",
+    pushover_user: str = "",
+    pushover_token: str = "",
+    sentry_event_level: LevelType = "WARNING",
+    sentry_breadcramp_level: LevelType = "DEBUG",
+    sentry_dsn: str = "",
 ):
     """Initialize loguru logging
 
@@ -70,15 +70,20 @@ def init_loguru(
     if file_on:
         file_fmt = fmt if file_fmt is None else file_fmt
         _logger.add(
-            file_path, format=file_fmt, level=level, enqueue=enqueue,
-            rotation=file_rotation, retention=file_retention
+            file_path,
+            format=file_fmt,
+            level=level,
+            enqueue=enqueue,
+            rotation=file_rotation,
+            retention=file_retention,
         )
 
     if pushover_on:
         from notifiers.logging import NotificationHandler
+
         pushover_fmt = fmt if pushover_fmt is None else pushover_fmt
         pushover_handler = NotificationHandler(
-            'pushover',
+            "pushover",
             defaults=dict(
                 user=pushover_user,
                 token=pushover_token,
@@ -89,12 +94,20 @@ def init_loguru(
 
     if sentry_on:
         import sentry_sdk
-        from sentry_sdk.integrations.logging import EventHandler, BreadcrumbHandler
+        from sentry_sdk.integrations.logging import BreadcrumbHandler, EventHandler
+
         sentry_fmt = fmt if sentry_fmt is None else sentry_fmt
         sentry_sdk.init(dsn=sentry_dsn, integrations=[])
 
         sentry_breadcrumb_handler = BreadcrumbHandler(level=sentry_breadcramp_level)
-        _logger.add(sentry_breadcrumb_handler, format=sentry_fmt, level=sentry_breadcramp_level, enqueue=enqueue)
+        _logger.add(
+            sentry_breadcrumb_handler,
+            format=sentry_fmt,
+            level=sentry_breadcramp_level,
+            enqueue=enqueue,
+        )
 
         sentry_event_handler = EventHandler(level=sentry_event_level)
-        _logger.add(sentry_event_handler, format=sentry_fmt, level=sentry_event_level, enqueue=enqueue)
+        _logger.add(
+            sentry_event_handler, format=sentry_fmt, level=sentry_event_level, enqueue=enqueue
+        )
