@@ -30,6 +30,7 @@ def init_loguru(
     pushover_fmt: Optional[str] = None,
     sentry_fmt: Optional[str] = None,
     slack_fmt: Optional[str] = None,
+    file_level: Optional[Union[str, int]] = None,
     file_path: PathType = Path(__file__).absolute().parent / "logs" / "log.log",
     file_rotation: str = "20 MB",
     file_retention: int = 1,
@@ -45,7 +46,7 @@ def init_loguru(
     """Initialize loguru logging
 
     :param fmt: logging format
-    :param level: logging level (stream and file handlers)
+    :param level: logging level for the stream handler
     :param enqueue: set true to make multiprocess / async safe
         always thread-safe
     :param stream_on: include stream logging handler
@@ -57,6 +58,8 @@ def init_loguru(
     :param pushover_fmt: pushover logging format (if None, fmt is used)
     :param sentry_fmt: sentry logging format (if None, fmt is used)
     :param slack_fmt: slack logging format (if None, fmt is used)
+    :param file_level: logging level for the file handler
+        Defaults to the stream handler level
     :param file_path: log file path
     :param file_rotation: rotate log file when it reaches this size
     :param file_retention: keep <n> old log file
@@ -77,10 +80,11 @@ def init_loguru(
 
     if file_on:
         file_fmt = fmt if file_fmt is None else file_fmt
+        file_level_ = level if file_level is None else file_level
         _logger.add(
             file_path,
             format=file_fmt,
-            level=level,
+            level=file_level_,
             enqueue=enqueue,
             rotation=file_rotation,
             retention=file_retention,
