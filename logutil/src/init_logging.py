@@ -23,6 +23,7 @@ def init_logging(
     pushover_on: bool = False,
     sentry_on: bool = False,
     slack_on: bool = False,
+    file_level: Optional[Union[str, int]] = None,
     file_path: PathType = Path(__file__).absolute().parent / "logs" / "log.log",
     file_rotation_bytes: int = 20 * 1024 * 1024,
     file_retention: int = 1,
@@ -41,13 +42,15 @@ def init_logging(
     :param fmt: logging format
     :param datefmt: datetime format
     :param use_gmt_time: if true, log datetime in GMT
-    :param level: logging level (stream and file handlers)
+    :param level: logging level for the stream handler
     :param propagate: if true, propagate to the root logger
     :param stream_on: include stream logging handler
     :param file_on: include file logging handler
     :param pushover_on: include pushover logging handler
     :param sentry_on: include sentry logging handler
     :param slack_on: include slack logging handler
+    :param file_level: logging level for the file handler
+        Defaults to the stream handler level
     :param file_path: log file path
     :param file_rotation_bytes: rotate log file when it reaches <n> bytes
     :param file_retention: keep <n> old log file
@@ -76,14 +79,16 @@ def init_logging(
         sh.setFormatter(formatter)
         _logger.addHandler(sh)
 
+    _logger.setLevel(level)
+
     if file_on:
         fh = RotatingFileHandler(
             file_path, mode="a", maxBytes=file_rotation_bytes, backupCount=file_retention
         )
         fh.setFormatter(formatter)
+        file_level_ = level if file_level is None else file_level
+        fh.setLevel(file_level_)
         _logger.addHandler(fh)
-
-    _logger.setLevel(level)
 
     if pushover_on:
         from notifiers.logging import NotificationHandler
