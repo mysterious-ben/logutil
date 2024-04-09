@@ -23,7 +23,7 @@ jobs:
     name: Setup and Runs Tests
     strategy:
       matrix:
-        python-version: [3.8, 3.9, 3.10]
+        python-version: ["3.8", "3.9", "3.10"]
 
     steps:
       - name: Clone repository
