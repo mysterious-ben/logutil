@@ -2,7 +2,6 @@
 Logging (standard python library)
 """
 
-
 import logging
 from pathlib import Path
 from typing import Optional, Union
