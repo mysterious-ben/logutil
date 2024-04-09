@@ -49,7 +49,7 @@ jobs:
       - name: Lint with flake8 (check only)
         run: |
           pip install flake8
-          flake8 . --count --show-source --statistics
+          flake8 . --count --show-source --statistics --config=.flake8
       - name: Run test suite
         run: |
           pip install pytest
