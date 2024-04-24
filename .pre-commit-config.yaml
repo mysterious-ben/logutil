@@ -34,4 +34,11 @@ repos:
         language: python
         'types': [python]
         pass_filenames: false
-        stages: [commit]
+
+  - repo: local
+    hooks:
+      - id: poetry_export
+        name: poetry_export
+        entry: poetry export --without-hashes -o requirements.txt
+        language: system
+        pass_filenames: false
