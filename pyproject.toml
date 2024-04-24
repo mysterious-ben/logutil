@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "logutil"
-version = "0.1.7"
+version = "0.0.0"
 description = "Easy initialization of standard python logging and loguru"
 authors = ["Mysterious Ben <datascience@tuta.io>"]
 license = "Apache License, Version 2.0"
@@ -10,19 +10,19 @@ readme = "README.md"
 python = "^3.8"
 
 [tool.poetry.group.loguru.dependencies]
-loguru = "^0.5"
+loguru = ">=0.5"
 
 [tool.poetry.group.notifiers.dependencies]
 notifiers = "^1.2"
 sentry-sdk = "^1.3"
 
 [tool.poetry.group.all.dependencies]
-loguru = "^0.5"
+loguru = ">=0.5"
 notifiers = "^1.2"
 sentry-sdk = "^1.3"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.3"
+ruff = ">=0.4"
 mypy = ">=0.910"
 pylint = "^3.1"
 black = "^24.3"
