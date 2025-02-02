@@ -10,25 +10,34 @@ jobs:
     if: github.event_name == 'release'
     name: Publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # Required for PyPI trusted publishing
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         ref: ${{ github.head_ref }}
-    - name: Set up python (required for poetry)
-      uses: actions/setup-python@v2
+
+    - name: Set up python
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.11'
+        cache: 'pip'
+
     - name: Install poetry
       run: |
         pip install poetry
+
     - name: Install dependencies using poetry
       run: |
         poetry install
+
     - name: Check code with ruff
       run: |
         poetry run ruff check .
+
     - name: Build and publish on PyPI
       run: |
         echo "Build package version $VERSION"
