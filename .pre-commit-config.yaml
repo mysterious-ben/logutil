@@ -1,19 +1,14 @@
 repos:
 
-  - repo: https://github.com/psf/black
-    rev: 24.3.0
-    hooks:
-      - id: black
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.5
+    rev: v0.12.0  # updated to latest released version
     hooks:
       - id: ruff
         args: [--fix]
-      # - id: ruff-format
+      # - id: ruff-format  # uncomment if you prefer Ruff formatting
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0  # updated to latest release
     hooks:
       - id: debug-statements
       - id: check-yaml
@@ -28,7 +23,7 @@ repos:
         name: pytest
         entry: pytest
         language: python
-        'types': [python]
+        types: [python]
         pass_filenames: false
 
   # - repo: local
