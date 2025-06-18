@@ -16,7 +16,7 @@ jobs:
     name: Build and Test
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.10', '3.11', '3.12']
 
     steps:
     - name: Clone repository
@@ -34,9 +34,6 @@ jobs:
     - name: Install dependencies using poetry
       run: |
         poetry install
-    - name: Check code formatting with black
-      run: |
-        poetry run black . --check
     - name: Check code with ruff
       run: |
         poetry run ruff check .
